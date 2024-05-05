@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
-* Студент: [Oleh Parkhomenko](https://up.htmlacademy.ru/ecmascript/23/user/635705).
-* Наставник: `Неизвестно`.
+- Студент: [Oleh Parkhomenko](https://up.htmlacademy.ru/ecmascript/23/user/635705).
+- Наставник: [Евгений Лепёшкин](https://htmlacademy.ru/profile/spearance).
 
 ---
 
