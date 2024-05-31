@@ -1,7 +1,7 @@
 import EventsListView from '../view/events-list-view.js';
 import EditPoint from '../view/edit-point-view.js';
 import EventView from '../view/event-view.js';
-import { render } from '../render.js';
+import { render } from '../framework/render.js';
 
 export default class BoardPresenter {
   eventsListComponent = new EventsListView();
@@ -25,7 +25,7 @@ export default class BoardPresenter {
         ),
         offers.find((offer) => offer.type === points[0].type)
       ),
-      this.eventsListComponent.getElement()
+      this.eventsListComponent.element
     );
 
     points.forEach((point) =>
@@ -37,7 +37,7 @@ export default class BoardPresenter {
           ),
           offers.find((offer) => offer.type === point.type)
         ),
-        this.eventsListComponent.getElement()
+        this.eventsListComponent.element
       )
     );
   }

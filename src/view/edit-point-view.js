@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { formattedFullDate, formattedTime } from '../utils.js';
 
 function createEditPointTemplate(point, destination, offer) {
@@ -132,26 +132,19 @@ function createEditPointTemplate(point, destination, offer) {
   `;
 }
 
-export default class EditPointView {
+export default class EditPointView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offer = null;
+
   constructor(point, destination, offer) {
-    this.point = point;
-    this.destination = destination;
-    this.offer = offer;
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offer = offer;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destination, this.offer);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destination, this.#offer);
   }
 }

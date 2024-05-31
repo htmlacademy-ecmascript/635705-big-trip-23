@@ -2,7 +2,7 @@ import TripFiltersView from './view/trip-filters-view.js';
 import TripSortView from './view/trip-sort-view.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import PointModel from './model/point-model.js';
-import { render } from './render.js';
+import { render } from './framework/render.js';
 
 const filters = document.querySelector('.trip-controls__filters');
 const tripEvents = document.querySelector('.trip-events');
