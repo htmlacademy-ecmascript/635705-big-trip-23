@@ -4,19 +4,22 @@ import EventView from '../view/event-view.js';
 import { render } from '../framework/render.js';
 
 export default class BoardPresenter {
-  eventsListComponent = new EventsListView();
+  #boardContainer = null;
+  #pointModel = null;
+
+  #eventsListComponent = new EventsListView();
 
   constructor({ boardContainer, pointModel }) {
-    this.boardContainer = boardContainer;
-    this.pointModel = pointModel;
+    this.#boardContainer = boardContainer;
+    this.#pointModel = pointModel;
   }
 
   init() {
-    const points = this.pointModel.getPoints();
-    const destinations = this.pointModel.getDestinations();
-    const offers = this.pointModel.getOffers();
+    const points = this.#pointModel.getPoints();
+    const destinations = this.#pointModel.getDestinations();
+    const offers = this.#pointModel.getOffers();
 
-    render(this.eventsListComponent, this.boardContainer);
+    render(this.#eventsListComponent, this.#boardContainer);
     render(
       new EditPoint(
         points[0],
@@ -25,7 +28,7 @@ export default class BoardPresenter {
         ),
         offers.find((offer) => offer.type === points[0].type)
       ),
-      this.eventsListComponent.element
+      this.#eventsListComponent.element
     );
 
     points.forEach((point) =>
@@ -37,7 +40,7 @@ export default class BoardPresenter {
           ),
           offers.find((offer) => offer.type === point.type)
         ),
-        this.eventsListComponent.element
+        this.#eventsListComponent.element
       )
     );
   }
