@@ -9,16 +9,22 @@ function createEventTemplate(point, destination, offer) {
   return `
     <li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="${dateFrom}">${formattedDate(dateFrom)}</time>
+        <time class="event__date" datetime="${dateFrom}">${formattedDate(
+  dateFrom
+)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom}">${formattedTime(dateFrom)}</time>
+            <time class="event__start-time" datetime="${dateFrom}">${formattedTime(
+  dateFrom
+)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo}">${formattedTime(dateTo)}</time>
+            <time class="event__end-time" datetime="${dateTo}">${formattedTime(
+  dateTo
+)}</time>
           </p>
           <p class="event__duration">${eventDuration(dateFrom, dateTo)}</p>
         </div>
@@ -27,15 +33,20 @@ function createEventTemplate(point, destination, offer) {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          ${offers.map(({title, price}) => (
-    `<li class="event__offer">
+          ${offers
+    .map(
+      ({ title, price }) =>
+        `<li class="event__offer">
             <span class="event__offer-title">${title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${price}</span>
           </li>`
-  )).join('')}
+    )
+    .join('')}
         </ul>
-        <button class="event__favorite-btn ${isFavorite && ' event__favorite-btn--active'}" type="button">
+        <button class="event__favorite-btn ${
+  isFavorite && ' event__favorite-btn--active'
+}" type="button">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -53,15 +64,31 @@ export default class EventView extends AbstractView {
   #point = null;
   #destination = null;
   #offer = null;
+  #clickHandler = null;
+  #rollupButton = null;
 
-  constructor(point, destination, offer) {
+  constructor(point, destination, offer, onEditClick) {
     super();
     this.#point = point;
     this.#destination = destination;
     this.#offer = offer;
+    this.#clickHandler = onEditClick;
+    this.#rollupButton = this.element.querySelector('.event__rollup-btn');
+
+    this.#rollupButton.addEventListener('click', this.#onClick);
   }
 
   get template() {
     return createEventTemplate(this.#point, this.#destination, this.#offer);
   }
+
+  removeElement() {
+    super.removeElement();
+    this.#rollupButton.removeEventListener('click', this.#onClick);
+  }
+
+  #onClick = (evt) => {
+    evt.preventDefault();
+    this.#clickHandler();
+  };
 }

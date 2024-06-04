@@ -17,8 +17,18 @@ export default class BoardPresenter {
       .getOffers()
       .find((of) => of.type === point.type);
 
-    const eventView = new EventView(point, destination, offer);
-    const editPointView = new EditPointView(point, destination, offer);
+    const onEditClick = () => {};
+    const onFormSubmit = () => {};
+    const onFormCancel = () => {};
+
+    const eventView = new EventView(point, destination, offer, onEditClick);
+    const editPointView = new EditPointView(
+      point,
+      destination,
+      offer,
+      onFormSubmit,
+      onFormCancel
+    );
 
     render(eventView, this.#eventsListComponent.element);
   }
