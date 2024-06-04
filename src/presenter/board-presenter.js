@@ -1,7 +1,7 @@
 import EventsListView from '../view/events-list-view.js';
 import EventView from '../view/event-view.js';
 import EditPointView from '../view/edit-point-view.js';
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -17,9 +17,9 @@ export default class BoardPresenter {
       .getOffers()
       .find((of) => of.type === point.type);
 
-    const onEditClick = () => {};
-    const onFormSubmit = () => {};
-    const onFormCancel = () => {};
+    const onEditClick = () => switchToEditMode();
+    const onFormSubmit = () => switchToViewMode();
+    const onFormCancel = () => switchToViewMode();
 
     const eventView = new EventView(point, destination, offer, onEditClick);
     const editPointView = new EditPointView(
@@ -29,6 +29,14 @@ export default class BoardPresenter {
       onFormSubmit,
       onFormCancel
     );
+
+    function switchToEditMode() {
+      replace(editPointView, eventView);
+    }
+
+    function switchToViewMode() {
+      replace(eventView, editPointView);
+    }
 
     render(eventView, this.#eventsListComponent.element);
   }
