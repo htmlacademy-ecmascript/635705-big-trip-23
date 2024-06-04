@@ -17,6 +17,13 @@ export default class BoardPresenter {
       .getOffers()
       .find((of) => of.type === point.type);
 
+    const onEsckeydown = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        switchToViewMode();
+      }
+    };
+
     const onEditClick = () => switchToEditMode();
     const onFormSubmit = () => switchToViewMode();
     const onFormCancel = () => switchToViewMode();
@@ -32,10 +39,12 @@ export default class BoardPresenter {
 
     function switchToEditMode() {
       replace(editPointView, eventView);
+      document.addEventListener('keydown', onEsckeydown);
     }
 
     function switchToViewMode() {
       replace(eventView, editPointView);
+      document.removeEventListener('keydown', onEsckeydown);
     }
 
     render(eventView, this.#eventsListComponent.element);
