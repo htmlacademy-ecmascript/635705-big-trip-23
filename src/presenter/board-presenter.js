@@ -1,44 +1,68 @@
 import EventsListView from '../view/events-list-view.js';
-import EditPoint from '../view/edit-point-view.js';
 import EventView from '../view/event-view.js';
-import { render } from '../render.js';
+import EditPointView from '../view/edit-point-view.js';
+import { render, replace } from '../framework/render.js';
 
 export default class BoardPresenter {
-  eventsListComponent = new EventsListView();
+  #boardContainer = null;
+  #pointModel = null;
+
+  #eventsListComponent = new EventsListView();
+
+  #renderPoint(point) {
+    const destination = this.#pointModel
+      .getDestinations()
+      .find((dest) => dest.id === point.destination);
+    const offer = this.#pointModel
+      .getOffers()
+      .find((of) => of.type === point.type);
+
+    const onEsckeydown = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        switchToViewMode();
+      }
+    };
+
+    const onEditClick = () => switchToEditMode();
+    const onFormSubmit = () => switchToViewMode();
+    const onFormCancel = () => switchToViewMode();
+
+    const eventView = new EventView(point, destination, offer, onEditClick);
+    const editPointView = new EditPointView(
+      point,
+      destination,
+      offer,
+      onFormSubmit,
+      onFormCancel
+    );
+
+    function switchToEditMode() {
+      replace(editPointView, eventView);
+      document.addEventListener('keydown', onEsckeydown);
+    }
+
+    function switchToViewMode() {
+      replace(eventView, editPointView);
+      document.removeEventListener('keydown', onEsckeydown);
+    }
+
+    render(eventView, this.#eventsListComponent.element);
+  }
+
+  #renderPoints() {
+    const points = this.#pointModel.getPoints();
+
+    render(this.#eventsListComponent, this.#boardContainer);
+    points.forEach((point) => this.#renderPoint(point));
+  }
 
   constructor({ boardContainer, pointModel }) {
-    this.boardContainer = boardContainer;
-    this.pointModel = pointModel;
+    this.#boardContainer = boardContainer;
+    this.#pointModel = pointModel;
   }
 
   init() {
-    const points = this.pointModel.getPoints();
-    const destinations = this.pointModel.getDestinations();
-    const offers = this.pointModel.getOffers();
-
-    render(this.eventsListComponent, this.boardContainer);
-    render(
-      new EditPoint(
-        points[0],
-        destinations.find(
-          (destination) => destination.id === points[0].destination
-        ),
-        offers.find((offer) => offer.type === points[0].type)
-      ),
-      this.eventsListComponent.getElement()
-    );
-
-    points.forEach((point) =>
-      render(
-        new EventView(
-          point,
-          destinations.find(
-            (destination) => destination.id === point.destination
-          ),
-          offers.find((offer) => offer.type === point.type)
-        ),
-        this.eventsListComponent.getElement()
-      )
-    );
+    this.#renderPoints();
   }
 }

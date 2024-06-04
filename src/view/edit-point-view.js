@@ -1,5 +1,4 @@
-/* eslint-disable indent */
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { formattedFullDate, formattedTime } from '../utils.js';
 
 function createEditPointTemplate(point, destination, offer) {
@@ -84,10 +83,14 @@ function createEditPointTemplate(point, destination, offer) {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formattedFullDate(dateFrom)} ${formattedTime(dateFrom)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formattedFullDate(
+    dateFrom
+  )} ${formattedTime(dateFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formattedFullDate(dateTo)} ${formattedTime(dateTo)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formattedFullDate(
+    dateTo
+  )} ${formattedTime(dateTo)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -109,8 +112,10 @@ function createEditPointTemplate(point, destination, offer) {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-              ${offers.map(({title, price}) => (
-                `<div class="event__offer-selector">
+              ${offers
+    .map(
+      ({ title, price }) =>
+        `<div class="event__offer-selector">
                   <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
                   <label class="event__offer-label" for="event-offer-luggage-1">
                     <span class="event__offer-title">${title}</span>
@@ -118,7 +123,8 @@ function createEditPointTemplate(point, destination, offer) {
                     <span class="event__offer-price">${price}</span>
                   </label>
                 </div>`
-              )).join('')}
+    )
+    .join('')}
             </div>
           </section>
 
@@ -132,26 +138,52 @@ function createEditPointTemplate(point, destination, offer) {
   `;
 }
 
-export default class EditPointView {
-  constructor(point, destination, offer) {
-    this.point = point;
-    this.destination = destination;
-    this.offer = offer;
+export default class EditPointView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #offer = null;
+  #submitHandler = null;
+  #cancelHandler = null;
+
+  constructor(point, destination, offer, onFormSubmit, onFormCancel) {
+    super();
+    this.#point = point;
+    this.#destination = destination;
+    this.#offer = offer;
+    this.#submitHandler = onFormSubmit;
+    this.#cancelHandler = onFormCancel;
+
+    this.element.addEventListener('submit', this.#onFormSubmit);
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#onFormCancel);
+    this.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#onFormCancel);
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.destination, this.offer);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get template() {
+    return createEditPointTemplate(this.#point, this.#destination, this.#offer);
   }
 
   removeElement() {
-    this.element = null;
+    super.removeElement();
+    this.element.removeEventListener('click', this.#onFormSubmit);
+    this.element
+      .querySelector('.event__rollup-btn')
+      .removeEventListener('click', this.#onFormCancel);
+    this.element
+      .querySelector('.event__reset-btn')
+      .removeEventListener('click', this.#onFormCancel);
   }
+
+  #onFormSubmit = (evt) => {
+    evt.preventDefault();
+    this.#submitHandler();
+  };
+
+  #onFormCancel = (evt) => {
+    evt.preventDefault();
+    this.#cancelHandler();
+  };
 }
