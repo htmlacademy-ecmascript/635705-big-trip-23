@@ -38,3 +38,10 @@ export const eventDuration = function (startTime, endTime) {
       .padStart(2, '0')}M`
     : `${minutes}M`;
 };
+
+export const firstLetterUpperCase = (word) => {
+  const [firstLetter, ...rest] = word;
+  return `${firstLetter.toUpperCase()}${rest.join('')}`;
+};
+
+export const calculateChecked = (isChecked) => (isChecked ? 'checked' : '');
