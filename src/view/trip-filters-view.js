@@ -16,7 +16,7 @@ function createTripFilterTemplate(value, isChecked) {
 
 function createTripFiltersTemplate(filters, currentFilter) {
   return `
-    form class="trip-filters" action="#" method="get">
+    <form class="trip-filters" action="#" method="get">
     ${filters
     .map((filter) =>
       createTripFilterTemplate(filter, filter === currentFilter)
