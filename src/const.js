@@ -47,3 +47,21 @@ export const ListEmptyMessages = {
   [Filters.PRESENT]: 'There are no present events now',
   [Filters.PAST]: 'There are no past events now',
 };
+
+const DEFAULT_EVENT_TYPE = 'Flight';
+
+export const BLANK_TRIP_EVENT = {
+  id: 0,
+  type: DEFAULT_EVENT_TYPE,
+  dateFrom: new Date(),
+  dateTo: null,
+  destination: null,
+  price: 0,
+  offers: [],
+  isFavorite: false,
+};
+
+export const Mode = {
+  VIEW: 'View',
+  EDIT: 'Edit',
+};
