@@ -2,47 +2,55 @@ import TripFiltersView from '../view/trip-filters-view.js';
 import TripSortView from '../view/trip-sort-view.js';
 import EventsListView from '../view/events-list-view.js';
 import ListEmptyView from '../view/list-empty.js';
-import { render } from '../framework/render.js';
+import { render, RenderPosition } from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
+import TripInfoView from '../view/trip-info-view.js';
+import { updateItem, isEmpty } from '../utils.js';
 
 export default class BoardPresenter {
-  #filtersContainer = null;
-  #tripEventsContainer = null;
+  #infoContainer = null;
+  #filterContainer = null;
+  #boardContainer = null;
   #pointModel = null;
 
   #points = [];
-  #destinations = [];
-  #offers = [];
-  #filters = [];
-
   #eventsListComponent = new EventsListView();
+  #pointPresenters = new Map();
 
-  constructor({ filtersContainer, tripEventsContainer, pointModel }) {
-    this.#filtersContainer = filtersContainer;
-    this.#tripEventsContainer = tripEventsContainer;
-    this.#pointModel = pointModel;
+  constructor({ infoContainer, filterContainer, boardContainer, model }) {
+    this.#infoContainer = infoContainer;
+    this.#filterContainer = filterContainer;
+    this.#boardContainer = boardContainer;
+    this.#pointModel = model;
   }
 
   init() {
-    this.#points = this.#pointModel.points;
-    this.#destinations = this.#pointModel.destinations;
-    this.#offers = this.#pointModel.offers;
-    this.#filters = this.#pointModel.filters;
-
+    this.#points = [...this.#pointModel.points];
+    this.#renderSummary(this.#pointModel.points);
+    this.#renderFilters(this.#pointModel.filters);
+    this.#clearTripEvents();
     this.#renderPoints();
   }
 
-  #renderTripFiltersView(filters) {
+  #renderSummary(points) {
     render(
-      new TripFiltersView({ filters, currentFilter: filters[0] }),
-      this.#filtersContainer
+      new TripInfoView(points),
+      this.#infoContainer,
+      RenderPosition.AFTERBEGIN
+    );
+  }
+
+  #renderFilters(filters) {
+    render(
+      new TripFiltersView({ filters, currentFilter: filters[-1] }),
+      this.#filterContainer
     );
   }
 
   #renderEmptyView() {
     render(
-      new ListEmptyView({ filter: this.#filters[0] }),
-      this.#tripEventsContainer
+      new ListEmptyView({ filter: this.#pointModel.filters[0] }),
+      this.#boardContainer
     );
   }
 
@@ -52,33 +60,41 @@ export default class BoardPresenter {
         sortTypes: this.#pointModel.sortTypes,
         currentSortType: this.#pointModel.sortTypes[0],
       }),
-      this.#tripEventsContainer
+      this.#boardContainer
     );
   }
 
   #renderPoints() {
-    this.#renderTripFiltersView(this.#filters);
-
-    if (!this.#points.length) {
+    if (isEmpty(this.#points)) {
       this.#renderEmptyView();
       return;
     }
 
     this.#renderSortView();
-    render(this.#eventsListComponent, this.#tripEventsContainer);
-    // points.forEach((point) => this.#renderPoint(point));
-    for (const point of this.#points) {
-      const destination = this.#destinations.find(
-        (dest) => dest.id === point.destination
-      );
-      const offer = this.#offers.find((of) => of.type === point.type);
-      const pointPresenter = new PointPresenter(
-        this.#eventsListComponent.element,
-        point,
-        destination,
-        offer
-      );
-      pointPresenter.init();
-    }
+    render(this.#eventsListComponent, this.#boardContainer);
+
+    this.#points.forEach((point) => {
+      const pointPresenter = new PointPresenter({
+        model: this.#pointModel,
+        container: this.#eventsListComponent.element,
+        onTripEventChange: this.#onTripEventChange,
+        onModeChange: this.#onTripEventModeChange,
+      });
+      pointPresenter.init(point);
+      this.#pointPresenters.set(point.id, pointPresenter);
+    });
   }
+
+  #clearTripEvents() {
+    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.delete());
+    this.#pointPresenters.clear();
+  }
+
+  #onTripEventChange = (updatedTripEvent) => {
+    this.#points = updateItem(this.#points, updatedTripEvent);
+    this.#pointPresenters.get(updatedTripEvent.id).init(updatedTripEvent);
+  };
+
+  #onTripEventModeChange = () =>
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
 }

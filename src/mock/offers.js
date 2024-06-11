@@ -129,4 +129,19 @@ export const offers = [
       },
     ],
   },
+  {
+    type: 'restaurant',
+    offers: [
+      {
+        id: 'b4c3e4e6-9053-42ce-b747-e281314baa39',
+        title: 'Book tickets',
+        price: 40,
+      },
+      {
+        id: 'b4c3e4e6-9053-42ce-b747-e281314baa40',
+        title: 'Lunch in city',
+        price: 30,
+      },
+    ],
+  },
 ];

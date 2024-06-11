@@ -45,3 +45,9 @@ export const firstLetterUpperCase = (word) => {
 };
 
 export const calculateChecked = (isChecked) => (isChecked ? 'checked' : '');
+
+export const isEmpty = (list) => list.length === 0;
+
+export const updateItem = (items, updatedItem) =>
+  items.map((item) => (item.id === updatedItem.id ? updatedItem : item));
+
